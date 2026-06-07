@@ -3,6 +3,8 @@ import voluptuous as vol
 from datetime import timedelta
 import os
 import shutil
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
 
 from homeassistant.core import HomeAssistant
 from homeassistant.config_entries import ConfigEntry
@@ -27,25 +29,27 @@ ATTR_DESCRIPTION = "description"
 ATTR_OWNER_ID = "owner_id"
 ATTR_USERNAME = "username"
 
+def _copy_card_file(card_source, card_dest, www_dir):
+    """Copy card file - blocking operation for executor."""
+    try:
+        os.makedirs(www_dir, exist_ok=True)
+        shutil.copy2(card_source, card_dest)
+        _LOGGER.info("Custom card copied to www/kanboard-card.js")
+    except Exception as e:
+        _LOGGER.warning("Could not copy custom card to www: %s", e)
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Kanboard Tasks Sync from a config entry flow setup."""
     kanboard_url = entry.data.get("url")
     kanboard_token = entry.data.get("api_token")
-    
-    # Copy custom card to www directory (run in executor to avoid blocking event loop)
-    async def copy_card_file():
-        try:
-            card_source = os.path.join(os.path.dirname(__file__), 'cards', 'kanboard-card-minimal.js')
-            www_dir = hass.config.path('www')
-            os.makedirs(www_dir, exist_ok=True)
-            card_dest = os.path.join(www_dir, 'kanboard-card.js')
-            shutil.copy2(card_source, card_dest)
-            _LOGGER.info("Custom card copied to www/kanboard-card.js")
-        except Exception as e:
-            _LOGGER.warning("Could not copy custom card to www: %s", e)
 
-    # Schedule the file copy in an executor to avoid blocking
-    hass.loop.create_task(copy_card_file())
+    # Copy custom card to www directory without blocking event loop
+    card_source = os.path.join(os.path.dirname(__file__), 'cards', 'kanboard-card.js')
+    www_dir = hass.config.path('www')
+    card_dest = os.path.join(www_dir, 'kanboard-card.js')
+
+    # Run file copy in executor to avoid blocking
+    await hass.async_add_executor_job(_copy_card_file, card_source, card_dest, www_dir)
 
     # 1. Initialize the custom API engine wrapper
     client = KanboardApiClient(kanboard_url, kanboard_token)
