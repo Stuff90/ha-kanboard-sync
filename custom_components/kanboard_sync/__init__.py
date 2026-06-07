@@ -32,16 +32,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     kanboard_url = entry.data.get("url")
     kanboard_token = entry.data.get("api_token")
     
-    # Copy custom card to www directory for easier access
-    try:
-        card_source = os.path.join(os.path.dirname(__file__), 'cards', 'kanboard-card.js')
-        www_dir = hass.config.path('www')
-        os.makedirs(www_dir, exist_ok=True)
-        card_dest = os.path.join(www_dir, 'kanboard-card.js')
-        shutil.copy2(card_source, card_dest)
-        _LOGGER.info("Custom card copied to www/kanboard-card.js")
-    except Exception as e:
-        _LOGGER.warning("Could not copy custom card to www: %s", e)
+    # Copy custom card to www directory (run in executor to avoid blocking event loop)
+    async def copy_card_file():
+        try:
+            card_source = os.path.join(os.path.dirname(__file__), 'cards', 'kanboard-card-minimal.js')
+            www_dir = hass.config.path('www')
+            os.makedirs(www_dir, exist_ok=True)
+            card_dest = os.path.join(www_dir, 'kanboard-card.js')
+            shutil.copy2(card_source, card_dest)
+            _LOGGER.info("Custom card copied to www/kanboard-card.js")
+        except Exception as e:
+            _LOGGER.warning("Could not copy custom card to www: %s", e)
+
+    # Schedule the file copy in an executor to avoid blocking
+    hass.loop.create_task(copy_card_file())
 
     # 1. Initialize the custom API engine wrapper
     client = KanboardApiClient(kanboard_url, kanboard_token)
