@@ -6,16 +6,7 @@
   "dependencies": [],
   "documentation": "https://github.com/Stuff90/ha-kanboard-sync",
   "iot_class": "local_polling",
-  "homeassistant": "2023.1.0",
+  "homeassistant": "2024.1.0",
   "requirements": [],
-  "version": "1.0.0",
-  "dashboard": {
-    "cards": [
-      {
-        "type": "kanboard-card",
-        "inline": true,
-        "filename": "kanboard-card.js"
-      }
-    ]
-  }
+  "version": "1.0.1"
 }
