@@ -1,0 +1,1 @@
+DOMAIN = "kanboard_sync"

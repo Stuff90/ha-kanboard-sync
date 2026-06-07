@@ -1,0 +1,146 @@
+move_task:
+  name: Move Kanboard Task
+  description: Transition an active task card into an alternative target board column column state.
+  fields:
+    task_id:
+      name: Task ID
+      description: The unique structural numerical identification integer tracking the task card.
+      required: true
+      example: 42
+      selector:
+        number:
+          min: 1
+          mode: box
+    column_id:
+      name: Column ID
+      description: The unique structural numerical tracking index integer of the target column lane.
+      required: true
+      example: 3
+      selector:
+        number:
+          min: 1
+          mode: box
+    project_id:
+      name: Project ID
+      description: The unique numerical tracking identification index tracking the board project framework.
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          mode: box
+
+create_task:
+  name: Create Kanboard Task
+  description: Create a new task in a Kanboard project.
+  fields:
+    title:
+      name: Title
+      description: The title of the task.
+      required: true
+      example: "Implement new feature"
+      selector:
+        text:
+    project_id:
+      name: Project ID
+      description: The ID of the project where the task will be created.
+      required: true
+      example: 1
+      selector:
+        number:
+          min: 1
+          mode: box
+    column_id:
+      name: Column ID
+      description: The ID of the column where the task will be placed.
+      required: true
+      example: 3
+      selector:
+        number:
+          min: 1
+          mode: box
+    description:
+      name: Description
+      description: Optional description of the task.
+      required: false
+      example: "This task involves implementing a new feature for the application."
+      selector:
+        text:
+          multiline: true
+    owner_id:
+      name: Assignee ID
+      description: Optional ID of the user to assign the task to. Check the Kanboard Users sensor for available user IDs.
+      required: false
+      example: 5
+      selector:
+        number:
+          min: 1
+          mode: box
+    username:
+      name: Assignee Username
+      description: Optional username of the user to assign the task to (alternative to owner_id). Check the Kanboard Users sensor for available usernames.
+      required: false
+      example: "john.doe"
+      selector:
+        text:
+
+update_task:
+  name: Update Kanboard Task
+  description: Update an existing task's title, description, or assignee.
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task to update.
+      required: true
+      example: 42
+      selector:
+        number:
+          min: 1
+          mode: box
+    title:
+      name: Title
+      description: New title for the task (optional).
+      required: false
+      example: "Updated title"
+      selector:
+        text:
+    description:
+      name: Description
+      description: New description for the task (optional).
+      required: false
+      example: "Updated task description"
+      selector:
+        text:
+          multiline: true
+    owner_id:
+      name: Assignee ID
+      description: New assignee user ID (optional).
+      required: false
+      example: 5
+      selector:
+        number:
+          min: 1
+          mode: box
+    username:
+      name: Assignee Username
+      description: New assignee username (alternative to owner_id, optional).
+      required: false
+      example: "john.doe"
+      selector:
+        text:
+
+delete_task:
+  name: Delete Kanboard Task
+  description: Permanently delete a task from Kanboard.
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task to delete.
+      required: true
+      example: 42
+      selector:
+        number:
+          min: 1
+          mode: box
+
+
